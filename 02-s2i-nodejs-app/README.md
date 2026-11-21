@@ -33,16 +33,22 @@ This demo demonstrates building and running a Node.js web application on OpenShi
 # 1. Switch or create project
 oc new-project openshift-demos || oc project openshift-demos
 
-# 2. Apply manifests
-oc apply -f k8s/
+# 3. Apply the declarative manifests
+oc apply -f k8s/imagestream.yaml
+oc apply -f k8s/buildconfig.yaml
 
-# 3. Stream local code directly to the OpenShift S2I build pod
+# 4. Trigger the S2I build by uploading the local directory
 oc start-build s2i-nodejs-demo --from-dir=. --follow
 
-# 4. Watch rollout
+# 5. Now that the image exists, deploy! (Will start in 2 seconds without getting stuck)
+oc apply -f k8s/deployment.yaml
+oc apply -f k8s/service.yaml
+oc apply -f k8s/route.yaml
+
+# 6. Watch rollout
 oc rollout status deployment/s2i-nodejs-demo
 
-# 5. Retrieve route hostname
+# 7. Retrieve route hostname
 ROUTE=$(oc get route s2i-nodejs-demo -o jsonpath='{.spec.host}')
 curl -k "https://${ROUTE}/"
 curl -k "https://${ROUTE}/healthz"
