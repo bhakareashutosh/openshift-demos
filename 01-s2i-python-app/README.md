@@ -37,12 +37,19 @@ oc login https://<api-url>:6443 --token=<your-token>
 oc new-project openshift-demos || oc project openshift-demos
 
 # 3. Apply the declarative manifests
-oc apply -f k8s/
+oc apply -f k8s/imagestream.yaml
+oc apply -f k8s/buildconfig.yaml
 
 # 4. Trigger the S2I build by uploading the local directory
 oc start-build s2i-python-demo --from-dir=. --follow
 
-# 5. Verify the deployment and route
+# 5. Now that the image exists, deploy! (Will start in 2 seconds without getting stuck)
+oc apply -f k8s/deployment.yaml
+oc apply -f k8s/service.yaml
+oc apply -f k8s/route.yaml
+
+
+# 6. Verify the deployment and route
 oc rollout status deployment/s2i-python-demo
 oc get route s2i-python-demo
 ```
